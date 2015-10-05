@@ -7,6 +7,7 @@ using NetPing.DAL;
 using NetPing.Models;
 using NetPing_modern.Properties;
 using System.Resources;
+using System.IO;
 
 namespace NetPing.Controllers
 {
@@ -157,6 +158,25 @@ namespace NetPing.Controllers
             return View();
         }
 
+        public ActionResult UploadStockFile()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        public ActionResult UploadStockFile(object file1)
+        {
+            HttpPostedFileBase file = Request.Files.Get(0);
+            if(file != null && file.ContentLength > 0)
+            {
+                StreamReader reader = new StreamReader(file.InputStream);
+                var jsonString = reader.ReadToEnd();
+                var start = jsonString.IndexOf('{');
+                jsonString = jsonString.Substring(start, jsonString.Length - start);
+                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString);
+            }
+
+            return new EmptyResult();
+        }
     }
 }
