@@ -8,6 +8,7 @@ using NetPing.Models;
 using NetPing_modern.Properties;
 using System.Resources;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace NetPing.Controllers
 {
@@ -170,13 +171,13 @@ namespace NetPing.Controllers
             if(file != null && file.ContentLength > 0)
             {
                 StreamReader reader = new StreamReader(file.InputStream);
-                var jsonString = reader.ReadToEnd();
-                var start = jsonString.IndexOf('{');
-                jsonString = jsonString.Substring(start, jsonString.Length - start);
-                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonString);
+                var fileContent = reader.ReadToEnd();
+                //Regex regex = new Regex(@"(([0-9a-fA-F]){8}([0-9a-fA-F]){4}([0-9a-fA-F]){4}([0-9a-fA-F]){4}([0-9a-fA-F]){12})");
+                new SPOnlineRepository(null).ParseStockFile(fileContent);
             }
 
-            return new EmptyResult();
+            ViewBag.Message = "Success";
+            return View();
         }
     }
 }

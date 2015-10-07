@@ -2,9 +2,20 @@
     Layout = "~/Views/Shared/Adaptive_master.cshtml";
 }
 
-<div>
-    <form action="/upload_stock" method="post" enctype="multipart/form-data">
-        <input type="file" name="file1"/>
-        <input type="submit" value="Upload"/>
-    </form>
+<div class="wrapper">
+    @if (ViewBag.Message != null)
+    {
+        <h1>@ViewBag.Message</h1>
+    }
+    else
+    {
+        <div class="form-group" style="margin-left: 10px;">
+            <label class="control-label">Upload your .mxl file</label>
+            <form action="/upload_stock" method="post" enctype="multipart/form-data" class="form-group">
+                <input type="file" name="file1" class="" />
+                <input type="submit" value="Upload" class="btn btn-success" style="margin-top: 5px;" />
+            </form>
+        </div>
+    }
 </div>
+

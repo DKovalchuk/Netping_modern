@@ -198,6 +198,7 @@
     <Compile Include="Mappers\DefaultMapper.cs" />
     <Compile Include="Mappers\IMapper.cs" />
     <Compile Include="Mappers\PostViewModelMapper.cs" />
+    <Compile Include="Models\DeviceCountItem.cs" />
     <Compile Include="Models\ProductsModel.cs" />
     <Compile Include="Models\SectionModel.cs" />
     <Compile Include="Resources\Views\Blog\Faq.Designer.cs">
@@ -644,6 +645,7 @@
     <Content Include="Views\InnerPages\UCacheAsync.cshtml" />
     <Content Include="Views\Products\Adaptive_device_view.cshtml" />
     <Content Include="Views\Products\Archive.cshtml" />
+    <Content Include="Views\InnerPages\UploadStockFile.cshtml" />
     <None Include="Web.config">
       <SubType>Designer</SubType>
     </None>

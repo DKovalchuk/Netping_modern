@@ -26,6 +26,7 @@ using NetPing_modern.Resources.Views.Catalog;
 using NetPing_modern.Services.Confluence;
 using Category = NetPing.PriceGeneration.YandexMarker.Category;
 using File = System.IO.File;
+using NetPing_modern.ViewModels;
 
 namespace NetPing.DAL
 {
@@ -1007,6 +1008,59 @@ namespace NetPing.DAL
             {
                 BuildTree(dev.AddChild(child), list);
             }
+        }
+
+        public void ParseStockFile(string fileContent)
+        {
+            Regex regex = new Regex(@"""[^\""]*""");
+            var allProducts = new List<string>();
+            var ignoreWords = new string[] { "\"Номенклатура\"", "\"ru\"", "\"S\"", "\"#\"", "\"Русский\"", "\"В ед. хранения\"", "\"Остаток\"", "\"Анализ доступности товаров на складах\"", "\"Зарезервировано\"", "\"Свободный остаток\"", "\"Группировки строк: Номенклатура (Элементы);\"", "\"Показатели: Остаток(В ед. хранения); Зарезервировано(В ед. хранения); Свободный остаток(В ед. хранения);\"", "\"Отборы:/n/rСклад Равно Склад Алентис ООО;\"" };
+            fileContent = fileContent.Replace("{1,0}", "{\"NULL\"}");
+            foreach (var product in regex.Matches(fileContent))
+            {
+                if (!ignoreWords.Contains(product.ToString()))
+                {
+                    if (product.ToString().Contains("NULL") && allProducts.Count == 0)
+                        continue;
+                    if (product.ToString() == "\"Итог\"")
+                        break;
+
+                    allProducts.Add(product.ToString());
+                }
+            }
+
+            allProducts = allProducts.Skip(2).ToList();
+
+            var deviceCountInfo = new List<DeviceCountItem>();
+            int index = 0;
+            for (var i = 0; i < allProducts.Count; i++)
+            {
+                var item = allProducts[i];
+                double result;
+                if (!double.TryParse(item.Replace("\"", ""), out result))
+                {
+                    if (item == "\"NULL\"")
+                        continue;
+
+                    double balance, freeBalance, reserved;
+                    if (!double.TryParse(allProducts[i + 1].Replace("\"", ""), out balance))
+                        balance = 0;
+                    if (!double.TryParse(allProducts[i + 2].Replace("\"", ""), out reserved))
+                        reserved = 0;
+                    if (!double.TryParse(allProducts[i + 3].Replace("\"", ""), out freeBalance))
+                        freeBalance = 0;
+
+                    deviceCountInfo.Add(new DeviceCountItem
+                    {
+                        Name = item.Replace("\"", ""),
+                        Balance = balance,
+                        FreeBalance = freeBalance,
+                        Reserved = reserved
+                    });
+                }
+            }
+
+            PushToCache("DeviceCountInfo", deviceCountInfo);
         }
 
         #region SharePoint Context
